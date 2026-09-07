@@ -12,6 +12,7 @@ This is a custom GitHub Action which facilitates communication between GitHub an
 - [4. Workflow Configuration](#4-workflow-configuration)
   - [4.1. Example Workflow Configuration](#41-example-workflow-configuration)
   - [4.2. Pipeline name pattern](#42-pipeline-name-pattern)
+    - [4.2.1. Preserving existing pipeline names](#421-preserving-existing-pipeline-names)
   - [4.3. Injecting Gherkin (BDD) test results](#43-injecting-gherkin-bdd-test-results)
   - [4.4. Debugging](#44-debugging)
 - [5. Credential Configuration](#5-credential-configuration-into-the-product)
@@ -23,6 +24,7 @@ This is a custom GitHub Action which facilitates communication between GitHub an
 - [8. Limitations](#8-limitations)
   - [8.1. Duplicate Workflow Run Protection](#81-duplicate-workflow-run-protection)
 - [9. Change log](#9-change-log)
+  - [Unreleased](#unreleased)
   - [v26.4.0](#v2640)
   - [v26.2.2](#v2622)
   - [v26.2.1](#v2621)
@@ -185,6 +187,19 @@ jobs:
 
 - Example: `NEW - ${repository_name} - ${workflow_name}`
 
+#### 4.2.1. Preserving existing pipeline names
+
+- By default, whenever a pipeline is created or updated, the integration searches for any other pipelines sharing the same root job CI ID and renames them to match the currently resolved `pipelineNamePattern`. This keeps a single pipeline in sync when its name changes over time.
+- If `pipelineNamePattern` resolves to a **different name across separate workflow runs that share the same root job CI ID** (for example, a name computed dynamically per component or matrix job), this automatic renaming can incorrectly rename or reuse an unrelated pipeline.
+- To prevent this, set the optional `preservePipelineNames` parameter to `true`. When enabled, the integration will still create or retrieve the pipeline using the current `pipelineNamePattern`, but it will **not** rename any other existing pipelines.
+- This parameter is **optional** and defaults to `false`, preserving the existing renaming behavior for backward compatibility.
+
+```yaml
+with:
+  ...
+  pipelineNamePattern: '${workflow_name}'
+  preservePipelineNames: 'true'
+```
 
 ### 4.3. Injecting Gherkin (BDD) test results
 
@@ -328,6 +343,10 @@ The integration now includes a **deployment lock mechanism** that automatically 
 To disable this feature (if needed for compatibility or specific use cases), set the `SDP_ENABLE_DEPLOYMENT_LOCK` environment variable to `false` in your integration job configuration.
 
 ## 9. Change log
+
+### Unreleased
+
+- Added an optional `preservePipelineNames` parameter. When set to `true`, the integration no longer renames existing pipelines that share the same root job CI ID as the currently resolved `pipelineNamePattern`. Defaults to `false` to preserve existing behavior.
 
 ### v26.4.0
 
