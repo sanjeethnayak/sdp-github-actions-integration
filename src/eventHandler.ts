@@ -343,11 +343,13 @@ const handlePipelineEvent = async (
           branchName
         );
 
-        await updatePipelineNameIfNeeded(
-          `${jobCiIdPrefix}*`,
-          ciServerBody,
-          pipelineName
-        );
+        if (!getConfig().preservePipelineNames) {
+          await updatePipelineNameIfNeeded(
+            `${jobCiIdPrefix}*`,
+            ciServerBody,
+            pipelineName
+          );
+        }
       }
 
       let pipelineData = await getPipelineData(

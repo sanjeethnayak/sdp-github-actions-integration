@@ -28,6 +28,10 @@ inputs:
   pipelineNamePattern:
     description: 'Pattern to build pipeline names'
     required: true
+  preservePipelineNames:
+    description: 'Do not rename existing pipelines based on pipelineNamePattern'
+    required: false
+    default: false
   unitTestResultsGlobPattern:
     description: 'Pattern to search unit test result report files in artifacts'
     required: false

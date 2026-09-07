@@ -93480,6 +93480,7 @@ try {
         githubToken: (0, core_1.getInput)('githubToken'),
         serverBaseUrl: (0, core_1.getInput)('serverBaseUrl'),
         pipelineNamePattern: (0, core_1.getInput)('pipelineNamePattern'),
+        preservePipelineNames: (0, core_1.getInput)('preservePipelineNames').toLowerCase() === 'true',
         testingFramework: (0, core_1.getInput)('testingFramework'),
         unitTestResultsGlobPattern: (0, core_1.getInput)('unitTestResultsGlobPattern'),
         gherkinTestResultsGlobPattern: (0, core_1.getInput)('gherkinTestResultsGlobPattern'),
@@ -93699,7 +93700,9 @@ const handlePipelineEvent = (event, repositoryOwner, repositoryName, workflowNam
             const pipelineName = (0, pipelineDataService_1.buildPipelineName)(event, repositoryOwner, repositoryName, workflowFileName, eventType != "completed" /* ActionsEventType.WORKFLOW_FINISHED */, pipelineNamePattern);
             if (isWorkflowQueued) {
                 yield (0, migrationService_1.performMigrations)(event, pipelineName, shortJobCiIdPrefix, ciServerBody, branchName);
-                yield (0, pipelineDataService_1.updatePipelineNameIfNeeded)(`${jobCiIdPrefix}*`, ciServerBody, pipelineName);
+                if (!(0, config_1.getConfig)().preservePipelineNames) {
+                    yield (0, pipelineDataService_1.updatePipelineNameIfNeeded)(`${jobCiIdPrefix}*`, ciServerBody, pipelineName);
+                }
             }
             let pipelineData = yield (0, pipelineDataService_1.getPipelineData)(pipelineName, ciServerBody, event, isWorkflowQueued, jobCiIdPrefix, jobs, configParameters);
             if (isWorkflowStarted) {

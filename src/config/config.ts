@@ -38,6 +38,7 @@ interface Config {
   githubToken: string;
   serverBaseUrl: string;
   pipelineNamePattern: string;
+  preservePipelineNames: boolean;
   testingFramework: string;
   unitTestResultsGlobPattern: string;
   gherkinTestResultsGlobPattern: string;
@@ -57,6 +58,8 @@ try {
     githubToken: getInput('githubToken'),
     serverBaseUrl: getInput('serverBaseUrl'),
     pipelineNamePattern: getInput('pipelineNamePattern'),
+    preservePipelineNames:
+      getInput('preservePipelineNames').toLowerCase() === 'true',
     testingFramework: getInput('testingFramework'),
     unitTestResultsGlobPattern: getInput('unitTestResultsGlobPattern'),
     gherkinTestResultsGlobPattern: getInput('gherkinTestResultsGlobPattern'),
