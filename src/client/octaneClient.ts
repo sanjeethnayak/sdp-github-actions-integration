@@ -219,7 +219,7 @@ export default class OctaneClient {
 
     const pipelines = await this.octane
       .get('pipelines')
-      .fields('name', 'ci_server', 'root_job')
+      .fields('name', 'ci_server', 'root_job', 'multi_branch_type')
       .query(pipelineQuery)
       .execute();
     if (
@@ -240,7 +240,19 @@ export default class OctaneClient {
       }
     }
 
-    return pipelines.data[0];
+    const pipeline: CiPipeline = pipelines.data[0];
+    if (!pipeline.multi_branch_type) {
+      this.LOGGER.info(
+        `Pipeline '${pipelineName}' is missing multi_branch_type, upgrading to '${MultiBranchType.PARENT}'...`
+      );
+      await this.updatePipeline({
+        id: pipeline.id,
+        multi_branch_type: MultiBranchType.PARENT
+      });
+      pipeline.multi_branch_type = MultiBranchType.PARENT;
+    }
+
+    return pipeline;
   };
 
   public static getCiServerOrCreate = async (

@@ -93152,7 +93152,7 @@ OctaneClient.getPipelineOrCreate = (pipelineName, ciServer, createOnAbsence = fa
         .build();
     const pipelines = yield _a.octane
         .get('pipelines')
-        .fields('name', 'ci_server', 'root_job')
+        .fields('name', 'ci_server', 'root_job', 'multi_branch_type')
         .query(pipelineQuery)
         .execute();
     if (!pipelines ||
@@ -93165,7 +93165,16 @@ OctaneClient.getPipelineOrCreate = (pipelineName, ciServer, createOnAbsence = fa
             throw new Error(`Pipeline '${pipelineName}' not found.`);
         }
     }
-    return pipelines.data[0];
+    const pipeline = pipelines.data[0];
+    if (!pipeline.multi_branch_type) {
+        _a.LOGGER.info(`Pipeline '${pipelineName}' is missing multi_branch_type, upgrading to '${"PARENT" /* MultiBranchType.PARENT */}'...`);
+        yield _a.updatePipeline({
+            id: pipeline.id,
+            multi_branch_type: "PARENT" /* MultiBranchType.PARENT */
+        });
+        pipeline.multi_branch_type = "PARENT" /* MultiBranchType.PARENT */;
+    }
+    return pipeline;
 });
 OctaneClient.getCiServerOrCreate = (instanceId, projectName, baseUri, createOnAbsence = false) => __awaiter(void 0, void 0, void 0, function* () {
     _a.LOGGER.debug(`Getting CI server with {instanceId='${instanceId}'}...`);
