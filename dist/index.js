@@ -93137,7 +93137,9 @@ OctaneClient.createPipeline = (pipelineName, ciServer, jobCiIdPrefix, jobs, para
             id: ciServer.id
         },
         root_job_ci_id: `${jobCiIdPrefix}`,
-        jobs: pipelineJobs
+        jobs: pipelineJobs,
+        // GitHub Actions workflow runs always carry a branch, so new pipelines must support branch child pipelines from creation
+        multi_branch_type: "PARENT" /* MultiBranchType.PARENT */
     })
         .fields('name', 'ci_server', 'root_job')
         .execute()).data[0];

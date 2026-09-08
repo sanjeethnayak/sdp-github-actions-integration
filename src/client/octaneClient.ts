@@ -33,6 +33,7 @@ import { getConfig } from '../config/config';
 import { ActionsJob } from '../dto/github/ActionsJob';
 import CiEvent from '../dto/octane/events/CiEvent';
 import CiEventsList from '../dto/octane/events/CiEventsList';
+import { MultiBranchType } from '../dto/octane/events/CiTypes';
 import CiBuildBody from '../dto/octane/general/bodies/CiBuildBody';
 import CiPipelineBody from '../dto/octane/general/bodies/CiPipelineBody';
 import CiServerBody from '../dto/octane/general/bodies/CiServerBody';
@@ -192,7 +193,9 @@ export default class OctaneClient {
             id: ciServer.id
           },
           root_job_ci_id: `${jobCiIdPrefix}`,
-          jobs: pipelineJobs
+          jobs: pipelineJobs,
+          // GitHub Actions workflow runs always carry a branch, so new pipelines must support branch child pipelines from creation
+          multi_branch_type: MultiBranchType.PARENT
         })
         .fields('name', 'ci_server', 'root_job')
         .execute()
